@@ -119,23 +119,56 @@
   }
 }
 
-/* Shooting star animation */
-@keyframes shootingStar {
-  0% {
-    transform: translateX(0) translateY(0) rotate(-45deg);
-    opacity: 1;
-  }
-  70% {
-    opacity: 1;
-  }
-  100% {
-    transform: translateX(500px) translateY(500px) rotate(-45deg);
-    opacity: 0;
-  }
+/* Shooting star animations - multiple directions */
+/* Direction: top-left to bottom-right */
+@keyframes shootingStar-tlbr {
+  0%   { transform: translateX(0) translateY(0) rotate(-45deg); opacity: 0; }
+  10%  { opacity: 1; }
+  80%  { opacity: 0.8; }
+  100% { transform: translateX(600px) translateY(600px) rotate(-45deg); opacity: 0; }
 }
 
+/* Direction: top-right to bottom-left */
+@keyframes shootingStar-trbl {
+  0%   { transform: translateX(0) translateY(0) rotate(225deg); opacity: 0; }
+  10%  { opacity: 1; }
+  80%  { opacity: 0.8; }
+  100% { transform: translateX(-600px) translateY(600px) rotate(225deg); opacity: 0; }
+}
+
+/* Direction: left to right (horizontal) */
+@keyframes shootingStar-lr {
+  0%   { transform: translateX(0) translateY(0) rotate(0deg); opacity: 0; }
+  10%  { opacity: 1; }
+  80%  { opacity: 0.8; }
+  100% { transform: translateX(700px) translateY(100px) rotate(0deg); opacity: 0; }
+}
+
+/* Direction: right to left (horizontal) */
+@keyframes shootingStar-rl {
+  0%   { transform: translateX(0) translateY(0) rotate(180deg); opacity: 0; }
+  10%  { opacity: 1; }
+  80%  { opacity: 0.8; }
+  100% { transform: translateX(-700px) translateY(100px) rotate(180deg); opacity: 0; }
+}
+
+/* Direction: steep top-left to bottom-right */
+@keyframes shootingStar-steep {
+  0%   { transform: translateX(0) translateY(0) rotate(-70deg); opacity: 0; }
+  10%  { opacity: 1; }
+  80%  { opacity: 0.8; }
+  100% { transform: translateX(250px) translateY(700px) rotate(-70deg); opacity: 0; }
+}
+
+.shooting-star-tlbr  { animation: shootingStar-tlbr  var(--dur, 1s) ease-out forwards; }
+.shooting-star-trbl  { animation: shootingStar-trbl  var(--dur, 1s) ease-out forwards; }
+.shooting-star-lr    { animation: shootingStar-lr    var(--dur, 1.2s) ease-out forwards; }
+.shooting-star-rl    { animation: shootingStar-rl    var(--dur, 1.2s) ease-out forwards; }
+.shooting-star-steep { animation: shootingStar-steep var(--dur, 0.9s) ease-out forwards; }
+
+/* Legacy fallback */
 .shooting-star {
-  animation: shootingStar 1s ease-out forwards;
+  animation: shootingStar-tlbr 1s ease-out forwards;
 }
 
 /* Float animation */
@@ -211,23 +244,7 @@
   animation: nebulaDrift 20s ease-in-out infinite;
 }
 
-/* Enhanced shooting star */
-@keyframes shootingStar {
-  0% {
-    transform: translateX(0) translateY(0) rotate(-45deg);
-    opacity: 0;
-  }
-  10% {
-    opacity: 1;
-  }
-  70% {
-    opacity: 1;
-  }
-  100% {
-    transform: translateX(600px) translateY(600px) rotate(-45deg);
-    opacity: 0;
-  }
-}
+/* (directional shooting star keyframes are defined above) */
 
 /* Wave animations */
 @keyframes wave1 {

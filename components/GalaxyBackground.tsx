@@ -314,63 +314,114 @@ const GalaxyBackground = React.memo(function GalaxyBackground() {
 
 export default GalaxyBackground
 
+// Direction configs for multi-directional shooting stars
+const STAR_DIRECTIONS = [
+  {
+    className: "shooting-star-tlbr",
+    // spawns from top-left area, travels to bottom-right
+    getPos: () => ({ x: Math.random() * 70, y: Math.random() * 50 }),
+    colors: ["rgba(6,182,212,0.8)", "rgba(255,255,255,0.9)", "rgba(14,165,233,0.9)"],
+  },
+  {
+    className: "shooting-star-trbl",
+    // spawns from top-right area, travels to bottom-left
+    getPos: () => ({ x: 30 + Math.random() * 70, y: Math.random() * 50 }),
+    colors: ["rgba(139,92,246,0.8)", "rgba(255,255,255,0.9)", "rgba(168,85,247,0.9)"],
+  },
+  {
+    className: "shooting-star-lr",
+    // spawns from left edge mid-screen, travels right
+    getPos: () => ({ x: Math.random() * 20, y: 20 + Math.random() * 60 }),
+    colors: ["rgba(59,130,246,0.8)", "rgba(255,255,255,0.9)", "rgba(6,182,212,0.8)"],
+  },
+  {
+    className: "shooting-star-rl",
+    // spawns from right edge mid-screen, travels left
+    getPos: () => ({ x: 70 + Math.random() * 30, y: 20 + Math.random() * 60 }),
+    colors: ["rgba(168,85,247,0.8)", "rgba(255,255,255,0.9)", "rgba(139,92,246,0.8)"],
+  },
+  {
+    className: "shooting-star-steep",
+    // spawns from top, falls steeply down
+    getPos: () => ({ x: 10 + Math.random() * 80, y: Math.random() * 30 }),
+    colors: ["rgba(255,255,255,0.9)", "rgba(6,182,212,0.7)", "rgba(14,165,233,0.8)"],
+  },
+]
+
+interface StarData {
+  id: number
+  x: number
+  y: number
+  size: number
+  duration: number
+  directionIdx: number
+  colorIdx: number
+}
+
 function ShootingStars() {
-  const [stars, setStars] = useState<{ id: number; x: number; y: number; size: number; duration: number }[]>([])
+  const [stars, setStars] = useState<StarData[]>([])
 
   useEffect(() => {
-    let timeoutId: NodeJS.Timeout
+    const timeouts: NodeJS.Timeout[] = []
 
     const createStar = () => {
+      const directionIdx = Math.floor(Math.random() * STAR_DIRECTIONS.length)
+      const dir = STAR_DIRECTIONS[directionIdx]
+      const pos = dir.getPos()
       const id = Date.now() + Math.random()
-      const x = Math.random() * 60 
-      const y = Math.random() * 40
-      const size = 80 + Math.random() * 60
-      const duration = 0.8 + Math.random() * 0.4
+      const size = 60 + Math.random() * 100
+      const duration = 0.6 + Math.random() * 0.8
+      const colorIdx = Math.floor(Math.random() * dir.colors.length)
 
-      setStars(prev => [...prev, { id, x, y, size, duration }])
-      
-      setTimeout(() => {
+      setStars(prev => [...prev, { id, x: pos.x, y: pos.y, size, duration, directionIdx, colorIdx }])
+
+      const cleanup = setTimeout(() => {
         setStars(prev => prev.filter(s => s.id !== id))
-      }, duration * 1000 + 200)
+      }, duration * 1000 + 300)
+      timeouts.push(cleanup)
     }
 
-    const scheduleNextStar = () => {
-      const delay = 4000 + Math.random() * 4000
-      timeoutId = setTimeout(() => {
-        createStar()
-        scheduleNextStar()
-      }, delay)
-    }
+    // Spawn multiple streams with different intervals for density
+    const intervals = [
+      setInterval(createStar, 1200 + Math.random() * 800),
+      setInterval(createStar, 1800 + Math.random() * 1000),
+      setInterval(createStar, 2500 + Math.random() * 1500),
+    ]
 
-    const initialTimer = setTimeout(() => {
-      createStar()
-      scheduleNextStar()
-    }, 1500)
+    // Fire a burst on mount
+    createStar()
+    setTimeout(createStar, 400)
+    setTimeout(createStar, 900)
 
     return () => {
-      clearTimeout(timeoutId)
-      clearTimeout(initialTimer)
+      intervals.forEach(clearInterval)
+      timeouts.forEach(clearTimeout)
     }
   }, [])
 
   return (
     <div className="fixed inset-0 z-0 pointer-events-none overflow-hidden">
-      {stars.map(star => (
-        <div
-          key={star.id}
-          className="absolute shooting-star"
-          style={{
-            left: `${star.x}%`,
-            top: `${star.y}%`,
-            width: `${star.size}px`,
-            height: "2px",
-            background: "linear-gradient(90deg, rgba(6, 182, 212, 0) 0%, rgba(6, 182, 212, 0.6) 30%, rgba(255, 255, 255, 0.9) 80%, #ffffff 100%)",
-            borderRadius: "100%",
-            boxShadow: "0 0 6px rgba(6, 182, 212, 0.8), 0 0 12px rgba(6, 182, 212, 0.5), 0 0 20px rgba(255, 255, 255, 0.3)",
-            animationDuration: `${star.duration}s`,
-          }}
-        />
-      ))}
+      {stars.map(star => {
+        const dir = STAR_DIRECTIONS[star.directionIdx]
+        const color = dir.colors[star.colorIdx]
+        const glowColor = color.replace(/[\d.]+\)$/, "0.6)")
+        return (
+          <div
+            key={star.id}
+            className={`absolute ${dir.className}`}
+            style={{
+              left: `${star.x}%`,
+              top: `${star.y}%`,
+              width: `${star.size}px`,
+              height: "2px",
+              background: `linear-gradient(90deg, transparent 0%, ${color.replace(/[\d.]+\)$/, "0.4)")} 20%, ${color} 70%, #ffffff 100%)`,
+              borderRadius: "100px",
+              boxShadow: `0 0 6px ${glowColor}, 0 0 14px ${glowColor}, 0 0 24px rgba(255,255,255,0.2)`,
+              ["--dur" as string]: `${star.duration}s`,
+            }}
+          />
+        )
+      })}
     </div>
   )
 }
