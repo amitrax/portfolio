@@ -294,8 +294,8 @@ const GalaxyBackground = React.memo(function GalaxyBackground() {
         </svg>
       </div>
 
-      {/* Particles - Hidden on mobile for performance */}
-      <div ref={particlesRef} className="hidden md:block fixed inset-0 z-0 transition-transform duration-200 ease-out pointer-events-none">
+      {/* Particles - Enabled on mobile */}
+      <div ref={particlesRef} className="fixed inset-0 z-0 transition-transform duration-200 ease-out pointer-events-none">
         <Particles
           id="tsparticles"
           particlesLoaded={particlesLoaded}
