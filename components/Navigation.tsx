@@ -1,7 +1,7 @@
 "use client"
 
 import { motion, AnimatePresence, useMotionValue, useSpring } from "framer-motion"
-import { Menu, X, Sparkles, Code2 } from "lucide-react"
+import { Menu, X, Sparkles, Code2, Sun, Moon } from "lucide-react"
 import { useState, useEffect } from "react"
 
 interface NavigationProps {
@@ -60,8 +60,8 @@ export default function Navigation({ onNavigate, activeSection }: NavigationProp
           onMouseMove={handleMouseMove}
           className={`relative rounded-2xl px-4 md:px-6 py-3 flex items-center justify-between overflow-hidden transition-all duration-500 ${
             isScrolled 
-              ? "bg-[#0a0f1a]/90 backdrop-blur-xl border border-cyan-500/20 shadow-[0_0_30px_rgba(6,182,212,0.15)]" 
-              : "bg-[#0a0f1a]/60 backdrop-blur-lg border border-white/5"
+              ? "bg-popover/90 backdrop-blur-xl border border-cyan-500/20 shadow-[0_0_30px_rgba(6,182,212,0.15)]" 
+              : "bg-card/60 backdrop-blur-lg border border-white/5"
           }`}
         >
           {/* Animated gradient border */}
@@ -123,8 +123,8 @@ export default function Navigation({ onNavigate, activeSection }: NavigationProp
                 style={{ backgroundSize: "200% 200%" }}
               />
               {/* Inner container */}
-              <div className="relative bg-[#0a0f1a] rounded-full px-4 py-2 flex items-center justify-center border border-cyan-500/30">
-                <span className="text-lg font-bold text-white tracking-wide">
+              <div className="relative bg-popover rounded-full px-4 py-2 flex items-center justify-center border border-cyan-500/30">
+                <span className="text-lg font-bold text-foreground tracking-wide">
                   AM
                 </span>
               </div>
@@ -220,37 +220,39 @@ export default function Navigation({ onNavigate, activeSection }: NavigationProp
             })}
           </div>
 
-          {/* Mobile Menu Button */}
-          <motion.button
-            onClick={() => setIsOpen(!isOpen)}
-            className="md:hidden relative z-10 p-2 rounded-lg bg-white/5 border border-white/10 text-foreground hover:text-cyan-400 hover:border-cyan-500/30 transition-all"
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-          >
-            <AnimatePresence mode="wait">
-              {isOpen ? (
-                <motion.div
-                  key="close"
-                  initial={{ rotate: -90, opacity: 0 }}
-                  animate={{ rotate: 0, opacity: 1 }}
-                  exit={{ rotate: 90, opacity: 0 }}
-                  transition={{ duration: 0.2 }}
-                >
-                  <X size={22} />
-                </motion.div>
-              ) : (
-                <motion.div
-                  key="menu"
-                  initial={{ rotate: 90, opacity: 0 }}
-                  animate={{ rotate: 0, opacity: 1 }}
-                  exit={{ rotate: -90, opacity: 0 }}
-                  transition={{ duration: 0.2 }}
-                >
-                  <Menu size={22} />
-                </motion.div>
-              )}
-            </AnimatePresence>
-          </motion.button>
+          <div className="flex items-center gap-3 relative z-10">
+            {/* Mobile Menu Button */}
+            <motion.button
+              onClick={() => setIsOpen(!isOpen)}
+              className="md:hidden p-2 rounded-lg bg-white/5 border border-white/10 text-foreground hover:text-cyan-400 hover:border-cyan-500/30 transition-all"
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+            >
+              <AnimatePresence mode="wait">
+                {isOpen ? (
+                  <motion.div
+                    key="close"
+                    initial={{ rotate: -90, opacity: 0 }}
+                    animate={{ rotate: 0, opacity: 1 }}
+                    exit={{ rotate: 90, opacity: 0 }}
+                    transition={{ duration: 0.2 }}
+                  >
+                    <X size={22} />
+                  </motion.div>
+                ) : (
+                  <motion.div
+                    key="menu"
+                    initial={{ rotate: 90, opacity: 0 }}
+                    animate={{ rotate: 0, opacity: 1 }}
+                    exit={{ rotate: -90, opacity: 0 }}
+                    transition={{ duration: 0.2 }}
+                  >
+                    <Menu size={22} />
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </motion.button>
+          </div>
         </motion.div>
 
         {/* Mobile Navigation */}
@@ -263,7 +265,7 @@ export default function Navigation({ onNavigate, activeSection }: NavigationProp
               transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
               className="md:hidden mt-2 overflow-hidden"
             >
-              <div className="bg-[#0a0f1a]/95 backdrop-blur-xl rounded-2xl p-3 border border-cyan-500/20 shadow-[0_0_30px_rgba(6,182,212,0.1)]">
+              <div className="bg-popover/95 backdrop-blur-xl rounded-2xl p-3 border border-cyan-500/20 shadow-[0_0_30px_rgba(6,182,212,0.1)]">
                 {navItems.map((item, index) => {
                   const isActive = activeSection === item.id
                   

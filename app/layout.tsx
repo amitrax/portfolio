@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
 import { Analytics } from '@vercel/analytics/next'
+import { GoogleAnalytics } from '@next/third-parties/google'
 import './globals.css'
 
 const inter = Inter({ 
@@ -14,6 +15,22 @@ export const metadata: Metadata = {
   generator: 'v0.app',
   keywords: ['Software Developer', 'Data Analyst', 'Python', 'React', 'Machine Learning', 'Portfolio'],
   authors: [{ name: 'Amit Mishra' }],
+  openGraph: {
+    type: 'website',
+    locale: 'en_US',
+    url: 'https://amitmishra.dev', // Replace with actual domain later
+    siteName: 'Amit Mishra Portfolio',
+    title: 'Amit Mishra | Software Developer & Data Analyst',
+    description: 'Premium portfolio of Amit Mishra - Software Developer & Data Analyst. Turning complex data into scalable, real-world solutions.',
+    images: [
+      {
+        url: '/og-image.jpg',
+        width: 1200,
+        height: 630,
+        alt: 'Amit Mishra - Portfolio',
+      },
+    ],
+  },
   icons: {
     icon: [
       {
@@ -39,10 +56,11 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="en" className="bg-[#050816]">
-      <body className={`${inter.variable} font-sans antialiased`}>
+    <html lang="en" className="dark bg-[#050816]">
+      <body className={`${inter.variable} font-sans antialiased transition-colors duration-300`}>
         {children}
         {process.env.NODE_ENV === 'production' && <Analytics />}
+        <GoogleAnalytics gaId="G-XXXXXXXXXX" />
       </body>
     </html>
   )

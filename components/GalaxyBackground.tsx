@@ -1,14 +1,14 @@
 "use client"
 
-import { useCallback, useEffect, useState, useRef } from "react"
+import React, { useCallback, useEffect, useState, useRef } from "react"
 import Particles, { initParticlesEngine } from "@tsparticles/react"
 import { loadSlim } from "@tsparticles/slim"
 import type { Engine, ISourceOptions } from "@tsparticles/engine"
 
-export default function GalaxyBackground() {
+const GalaxyBackground = React.memo(function GalaxyBackground() {
   const [init, setInit] = useState(false)
-  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 })
   const nebulaRef = useRef<HTMLDivElement>(null)
+  const particlesRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     initParticlesEngine(async (engine: Engine) => {
@@ -18,16 +18,34 @@ export default function GalaxyBackground() {
     })
   }, [])
 
-  // Mouse parallax effect
+  // Mouse parallax effect without state updates to prevent re-renders
   useEffect(() => {
+    let rafId: number
+    let targetX = 0
+    let targetY = 0
+
     const handleMouseMove = (e: MouseEvent) => {
-      const x = (e.clientX / window.innerWidth - 0.5) * 20
-      const y = (e.clientY / window.innerHeight - 0.5) * 20
-      setMousePosition({ x, y })
+      targetX = (e.clientX / window.innerWidth - 0.5) * 20
+      targetY = (e.clientY / window.innerHeight - 0.5) * 20
+    }
+
+    const animate = () => {
+      if (nebulaRef.current) {
+        nebulaRef.current.style.transform = `translate(${targetX * 0.5}px, ${targetY * 0.5}px)`
+      }
+      if (particlesRef.current) {
+        particlesRef.current.style.transform = `translate(${targetX * 0.3}px, ${targetY * 0.3}px)`
+      }
+      rafId = requestAnimationFrame(animate)
     }
 
     window.addEventListener("mousemove", handleMouseMove)
-    return () => window.removeEventListener("mousemove", handleMouseMove)
+    rafId = requestAnimationFrame(animate)
+    
+    return () => {
+      window.removeEventListener("mousemove", handleMouseMove)
+      cancelAnimationFrame(rafId)
+    }
   }, [])
 
   const particlesLoaded = useCallback(async () => {}, [])
@@ -84,7 +102,7 @@ export default function GalaxyBackground() {
           width: 1920,
           height: 1080,
         },
-        value: 250,
+        value: 120, // Reduced from 250 for better performance
       },
       opacity: {
         value: { min: 0.1, max: 1 },
@@ -120,19 +138,16 @@ export default function GalaxyBackground() {
     <>
       {/* Deep space gradient base */}
       <div 
-        className="fixed inset-0 z-0 pointer-events-none"
+        className="fixed inset-0 z-0 pointer-events-none transition-all duration-500"
         style={{
-          background: "linear-gradient(180deg, #050816 0%, #0a0d1a 25%, #0b0f19 50%, #0a0d1a 75%, #050816 100%)"
+          background: "linear-gradient(180deg, var(--background) 0%, var(--popover) 25%, var(--card) 50%, var(--popover) 75%, var(--background) 100%)"
         }}
       />
 
-      {/* Nebula clouds with parallax */}
+      {/* Nebula clouds with parallax - Hidden on mobile for performance */}
       <div 
         ref={nebulaRef}
-        className="fixed inset-0 z-0 pointer-events-none transition-transform duration-300 ease-out"
-        style={{
-          transform: `translate(${mousePosition.x * 0.5}px, ${mousePosition.y * 0.5}px)`,
-        }}
+        className="hidden md:block fixed inset-0 z-0 pointer-events-none transition-transform duration-300 ease-out"
       >
         {/* Primary nebula - cyan/blue */}
         <div 
@@ -233,9 +248,9 @@ export default function GalaxyBackground() {
           />
         </svg>
 
-        {/* Floating wave lines */}
+        {/* Floating wave lines (Hidden on mobile for performance) */}
         <svg
-          className="absolute top-1/3 left-0 w-full h-64 opacity-30 animate-wave-float"
+          className="hidden md:block absolute top-1/3 left-0 w-full h-64 opacity-30 animate-wave-float"
           viewBox="0 0 1440 320"
           preserveAspectRatio="none"
         >
@@ -256,9 +271,9 @@ export default function GalaxyBackground() {
           </defs>
         </svg>
 
-        {/* Second floating wave line */}
+        {/* Second floating wave line (Hidden on mobile for performance) */}
         <svg
-          className="absolute top-2/3 left-0 w-full h-64 opacity-20 animate-wave-float-reverse"
+          className="hidden md:block absolute top-2/3 left-0 w-full h-64 opacity-20 animate-wave-float-reverse"
           viewBox="0 0 1440 320"
           preserveAspectRatio="none"
         >
@@ -279,28 +294,32 @@ export default function GalaxyBackground() {
         </svg>
       </div>
 
-      {/* Particles */}
-      <Particles
-        id="tsparticles"
-        particlesLoaded={particlesLoaded}
-        options={options}
-        className="fixed inset-0 z-0"
-        style={{
-          transform: `translate(${mousePosition.x * 0.3}px, ${mousePosition.y * 0.3}px)`,
-          transition: "transform 0.2s ease-out",
-        }}
-      />
+      {/* Particles - Hidden on mobile for performance */}
+      <div ref={particlesRef} className="hidden md:block fixed inset-0 z-0 transition-transform duration-200 ease-out pointer-events-none">
+        <Particles
+          id="tsparticles"
+          particlesLoaded={particlesLoaded}
+          options={options}
+          className="w-full h-full pointer-events-auto"
+        />
+      </div>
 
-      {/* Shooting stars */}
-      <ShootingStars />
+      {/* Shooting stars (Hidden on mobile for performance) */}
+      <div className="hidden md:block">
+        <ShootingStars />
+      </div>
     </>
   )
-}
+})
+
+export default GalaxyBackground
 
 function ShootingStars() {
   const [stars, setStars] = useState<{ id: number; x: number; y: number; size: number; duration: number }[]>([])
 
   useEffect(() => {
+    let timeoutId: NodeJS.Timeout
+
     const createStar = () => {
       const id = Date.now() + Math.random()
       const x = Math.random() * 60 
@@ -317,7 +336,7 @@ function ShootingStars() {
 
     const scheduleNextStar = () => {
       const delay = 4000 + Math.random() * 4000
-      setTimeout(() => {
+      timeoutId = setTimeout(() => {
         createStar()
         scheduleNextStar()
       }, delay)
@@ -328,7 +347,10 @@ function ShootingStars() {
       scheduleNextStar()
     }, 1500)
 
-    return () => clearTimeout(initialTimer)
+    return () => {
+      clearTimeout(timeoutId)
+      clearTimeout(initialTimer)
+    }
   }, [])
 
   return (

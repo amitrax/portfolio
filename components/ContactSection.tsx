@@ -30,7 +30,7 @@ export default function ContactSection() {
   }
 
   return (
-    <section id="contact" ref={ref} className="py-20 px-6 pb-32">
+    <section id="contact" ref={ref} className="py-12 sm:py-16 px-4 sm:px-6 pb-20 sm:pb-28">
       <div className="max-w-3xl mx-auto">
         <motion.div
           initial={{ opacity: 0, y: 30 }}
@@ -46,12 +46,12 @@ export default function ContactSection() {
           </p>
 
           {/* Contact Links */}
-          <div className="flex flex-wrap gap-4 mb-10">
+          <div className="flex flex-col sm:flex-row flex-wrap items-center justify-center sm:justify-start gap-4 mb-10">
             <motion.a
               href="mailto:amitmishra71204@gmail.com"
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
-              className="flex items-center gap-2 px-5 py-3 glass rounded-2xl border border-primary/30 hover:border-primary/60 transition-all"
+              className="flex w-full sm:w-auto justify-center items-center gap-2 px-4 py-3 glass rounded-2xl border border-primary/30 hover:border-primary/60 transition-all"
             >
               <Mail className="w-5 h-5 text-primary" />
               <span className="text-foreground">amitmishra71204@gmail.com</span>
@@ -63,7 +63,7 @@ export default function ContactSection() {
               rel="noopener noreferrer"
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
-              className="flex items-center gap-2 px-5 py-3 glass rounded-2xl border border-primary/30 hover:border-primary/60 transition-all"
+              className="flex w-full sm:w-auto justify-center items-center gap-2 px-4 py-3 glass rounded-2xl border border-primary/30 hover:border-primary/60 transition-all"
             >
               <Linkedin className="w-5 h-5 text-primary" />
               <span className="text-foreground">LinkedIn</span>
@@ -76,7 +76,7 @@ export default function ContactSection() {
             initial={{ opacity: 0, y: 20 }}
             animate={isInView ? { opacity: 1, y: 0 } : {}}
             transition={{ duration: 0.6, delay: 0.2 }}
-            className="glass rounded-2xl p-6 md:p-8"
+            className="glass rounded-2xl p-5 sm:p-8"
           >
             <div className="grid gap-5">
               <div>

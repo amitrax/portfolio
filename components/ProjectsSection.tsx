@@ -11,7 +11,7 @@ const projects = [
     subtitle: "Multi-Feature AI SaaS Platform",
     description:
       "Built a full-stack AI-powered SaaS platform integrating multiple intelligent tools into a unified system, including an AI chat assistant, image generator, resume builder, and ATS resume analyzer. The platform uses Google Gemini API for real-time responses and intelligent content generation, along with ATS scoring, keyword extraction, and resume optimization.",
-    tech: ["Next.js", "Tailwind CSS", "Flask", "MongoDB", "Gemini API"],
+    tech: ["Next.js", "Tailwind CSS", "Flask", "MongoDB", "Gemini API", "AI", "SaaS", "Full Stack"],
     featured: true,
     isFeaturedMain: true,
     github: "https://github.com/amitrax/ai-saas-frontend",
@@ -62,17 +62,15 @@ function ProjectCard({ project, index, isInView }: ProjectCardProps) {
       transition={{ duration: 0.6, delay: 0.1 + index * 0.15, ease: "easeOut" }}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
-      className={`relative group rounded-2xl transition-all duration-500 ${
-        project.isFeaturedMain ? "md:col-span-2" : ""
-      }`}
+      className="relative group rounded-xl transition-all duration-500 flex flex-col h-full min-h-[420px]"
     >
       {/* Animated border glow */}
       <div 
-        className={`absolute -inset-[1px] rounded-2xl transition-all duration-500 ${
+        className={`absolute -inset-[1px] rounded-xl transition-all duration-500 ${
           project.isFeaturedMain 
             ? "bg-gradient-to-r from-primary via-accent to-blue-500 opacity-60" 
             : isHovered 
-              ? "bg-gradient-to-r from-primary/80 to-accent/80 opacity-100" 
+              ? "bg-gradient-to-r from-cyan-500/80 to-blue-500/80 opacity-100" 
               : "bg-gradient-to-r from-primary/30 to-accent/30 opacity-0"
         }`}
         style={{
@@ -82,19 +80,14 @@ function ProjectCard({ project, index, isInView }: ProjectCardProps) {
       
       {/* Card content */}
       <div 
-        className={`relative glass rounded-2xl p-6 md:p-8 h-full transition-all duration-500 ${
-          isHovered ? "bg-card/90" : "bg-card/75"
-        }`}
-        style={{
-          transform: isHovered ? "translateY(-8px) scale(1.02)" : "translateY(0) scale(1)",
-          boxShadow: isHovered 
-            ? "0 20px 40px rgba(6, 182, 212, 0.15), 0 0 60px rgba(6, 182, 212, 0.1)" 
-            : project.isFeaturedMain 
-              ? "0 10px 30px rgba(6, 182, 212, 0.1)" 
-              : "none",
-        }}
+        className={`relative rounded-xl p-4 sm:p-6 h-full flex flex-col justify-between transition-all duration-500 border ${
+          isHovered 
+            ? "bg-gradient-to-br from-blue-950/80 to-slate-900/90 backdrop-blur-xl border-cyan-500/50 shadow-[0_0_20px_rgba(6,182,212,0.3)] md:-translate-y-[5px] md:scale-[1.02]" 
+            : "bg-gradient-to-br from-blue-950/40 to-slate-950/80 backdrop-blur-xl border-cyan-500/20 shadow-[0_0_10px_rgba(6,182,212,0.05)]"
+        } ${project.isFeaturedMain && !isHovered ? "border-cyan-500/40 shadow-[0_0_15px_rgba(6,182,212,0.15)]" : ""}`}
       >
-        {/* Featured badge */}
+        <div>
+          {/* Featured badge */}
         {project.isFeaturedMain ? (
           <motion.div 
             initial={{ opacity: 0, scale: 0.8 }}
@@ -114,9 +107,7 @@ function ProjectCard({ project, index, isInView }: ProjectCardProps) {
         ) : null}
 
         {/* Title */}
-        <h3 className={`font-bold text-foreground mb-2 transition-colors ${
-          project.isFeaturedMain ? "text-2xl md:text-3xl" : "text-xl md:text-2xl"
-        } ${isHovered ? "text-primary" : ""}`}>
+        <h3 className={`font-bold text-foreground mb-2 transition-colors text-xl md:text-2xl ${isHovered ? "text-primary" : ""}`}>
           {project.title}
         </h3>
         
@@ -126,9 +117,7 @@ function ProjectCard({ project, index, isInView }: ProjectCardProps) {
 
         {/* Description with reveal effect */}
         <motion.p 
-          className={`text-muted-foreground mb-5 leading-relaxed ${
-            project.isFeaturedMain ? "text-base" : "text-sm md:text-base"
-          }`}
+          className="text-muted-foreground mb-5 leading-relaxed text-sm md:text-base line-clamp-4"
           animate={{
             opacity: isHovered ? 1 : 0.8,
           }}
@@ -139,7 +128,7 @@ function ProjectCard({ project, index, isInView }: ProjectCardProps) {
 
         {/* Tech Stack with stagger animation */}
         <div className="flex flex-wrap gap-2 mb-6">
-          {project.tech.map((tech, techIndex) => (
+          {project.tech.slice(0, 4).map((tech, techIndex) => (
             <motion.span
               key={tech}
               initial={{ opacity: 0, scale: 0.8 }}
@@ -153,17 +142,28 @@ function ProjectCard({ project, index, isInView }: ProjectCardProps) {
               {tech}
             </motion.span>
           ))}
+          {project.tech.length > 4 && (
+            <motion.span
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={isInView ? { opacity: 1, scale: 1 } : {}}
+              transition={{ delay: 0.5, duration: 0.3 }}
+              className="px-3 py-1.5 text-sm bg-secondary/30 text-muted-foreground rounded-lg border border-border/50 cursor-default"
+            >
+              +{project.tech.length - 4}
+            </motion.span>
+          )}
+          </div>
         </div>
 
         {/* Action Buttons with enhanced hover */}
-        <div className="flex gap-3">
+        <div className="mt-auto flex flex-col sm:flex-row gap-3 w-full">
           <motion.a
             href={project.demo}
             target="_blank"
             rel="noopener noreferrer"
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
-            className={`relative flex items-center gap-2 px-5 py-2.5 font-medium rounded-xl overflow-hidden transition-all ${
+            className={`relative flex-1 w-full flex justify-center items-center gap-2 px-4 py-3 font-medium rounded-xl overflow-hidden transition-all ${
               project.isFeaturedMain 
                 ? "bg-gradient-to-r from-primary to-accent text-primary-foreground" 
                 : "bg-gradient-to-r from-primary to-accent text-primary-foreground"
@@ -185,7 +185,7 @@ function ProjectCard({ project, index, isInView }: ProjectCardProps) {
             rel="noopener noreferrer"
             whileHover={{ scale: 1.05, borderColor: "rgba(6, 182, 212, 0.8)" }}
             whileTap={{ scale: 0.95 }}
-            className="flex items-center gap-2 px-5 py-2.5 glass border border-primary/30 text-foreground font-medium rounded-xl transition-all"
+            className="flex-1 w-full flex justify-center items-center gap-2 px-4 py-3 glass border border-primary/30 text-foreground font-medium rounded-xl transition-all"
           >
             <Github className="w-4 h-4" />
             GitHub
@@ -201,8 +201,8 @@ export default function ProjectsSection() {
   const isInView = useInView(ref, { once: true, margin: "-100px" })
 
   return (
-    <section id="projects" ref={ref} className="py-20 px-6">
-      <div className="max-w-5xl mx-auto">
+    <section id="projects" ref={ref} className="py-12 sm:py-16 px-4 sm:px-6">
+      <div className="max-w-6xl mx-auto">
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           animate={isInView ? { opacity: 1, y: 0 } : {}}
@@ -213,7 +213,7 @@ export default function ProjectsSection() {
           </h2>
           <div className="w-20 h-1 bg-gradient-to-r from-primary to-accent rounded-full mb-10" />
 
-          <div className="grid md:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 items-stretch">
             {projects.map((project, index) => (
               <ProjectCard
                 key={project.title}

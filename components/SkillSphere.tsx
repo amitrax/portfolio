@@ -1,9 +1,10 @@
 "use client"
 
-import { useRef, useMemo, useState } from "react"
+import { useRef, useMemo, useState, useEffect } from "react"
 import { Canvas, useFrame, useThree } from "@react-three/fiber"
 import { Text, OrbitControls } from "@react-three/drei"
 import * as THREE from "three"
+import { ErrorBoundary } from "./ErrorBoundary"
 
 const skills = [
   "Python", "C", "C++", "Java", "SQL",
@@ -83,7 +84,7 @@ function SkillText({ text, position, sphereRef }: SkillTextProps) {
   )
 }
 
-function SphereGlow() {
+function SphereGlow({ isMobile }: { isMobile: boolean }) {
   const meshRef = useRef<THREE.Mesh>(null)
   
   useFrame(({ clock }) => {
@@ -95,7 +96,7 @@ function SphereGlow() {
 
   return (
     <mesh ref={meshRef}>
-      <sphereGeometry args={[2.2, 32, 32]} />
+      <sphereGeometry args={[2.2, isMobile ? 16 : 32, isMobile ? 16 : 32]} />
       <meshBasicMaterial
         color="#06b6d4"
         transparent
@@ -107,7 +108,7 @@ function SphereGlow() {
   )
 }
 
-function OrbitRings() {
+function OrbitRings({ isMobile }: { isMobile: boolean }) {
   const ringRef1 = useRef<THREE.Mesh>(null)
   const ringRef2 = useRef<THREE.Mesh>(null)
   const ringRef3 = useRef<THREE.Mesh>(null)
@@ -122,29 +123,31 @@ function OrbitRings() {
   return (
     <>
       <mesh ref={ringRef1} rotation={[Math.PI / 2.5, 0, 0]}>
-        <torusGeometry args={[2.3, 0.005, 16, 100]} />
+        <torusGeometry args={[2.3, 0.005, isMobile ? 8 : 16, isMobile ? 50 : 100]} />
         <meshBasicMaterial color="#06b6d4" transparent opacity={0.1} />
       </mesh>
       <mesh ref={ringRef2} rotation={[Math.PI / 3, Math.PI / 4, 0]}>
-        <torusGeometry args={[2.1, 0.003, 16, 100]} />
+        <torusGeometry args={[2.1, 0.003, isMobile ? 8 : 16, isMobile ? 50 : 100]} />
         <meshBasicMaterial color="#0ea5e9" transparent opacity={0.08} />
       </mesh>
       <mesh ref={ringRef3} rotation={[Math.PI / 2, Math.PI / 3, 0]}>
-        <torusGeometry args={[2.5, 0.003, 16, 100]} />
+        <torusGeometry args={[2.5, 0.003, isMobile ? 8 : 16, isMobile ? 50 : 100]} />
         <meshBasicMaterial color="#3b82f6" transparent opacity={0.06} />
       </mesh>
     </>
   )
 }
 
-function SkillCloud() {
+function SkillCloud({ isMobile }: { isMobile: boolean }) {
   const groupRef = useRef<THREE.Group>(null)
-  const velocityRef = useRef(0.15)
+  const velocityRef = useRef(isMobile ? 0.08 : 0.15)
   const { gl } = useThree()
+  
+  const activeSkills = useMemo(() => isMobile ? skills.slice(0, 10) : skills, [isMobile])
   
   const positions = useMemo(() => {
     const points: THREE.Vector3[] = []
-    const numPoints = skills.length
+    const numPoints = activeSkills.length
     const phi = Math.PI * (3 - Math.sqrt(5))
     
     for (let i = 0; i < numPoints; i++) {
@@ -164,24 +167,29 @@ function SkillCloud() {
   // Inertia-based rotation
   useFrame((_, delta) => {
     if (groupRef.current) {
-      // Natural slowdown with minimum speed
-      velocityRef.current = Math.max(0.08, velocityRef.current * 0.998)
+      // Natural slowdown with minimum speed - slower on mobile
+      velocityRef.current = Math.max(isMobile ? 0.04 : 0.08, velocityRef.current * 0.998)
       groupRef.current.rotation.y += delta * velocityRef.current
     }
   })
 
-  // Reset velocity on interaction
-  const handlePointerDown = () => {
-    velocityRef.current = 0.3
-  }
-
-  gl.domElement.addEventListener("pointerdown", handlePointerDown)
+  // Reset velocity on interaction — properly registered via useEffect
+  useEffect(() => {
+    const handlePointerDown = () => {
+      velocityRef.current = isMobile ? 0.15 : 0.3
+    }
+    const canvas = gl.domElement
+    canvas.addEventListener("pointerdown", handlePointerDown)
+    return () => {
+      canvas.removeEventListener("pointerdown", handlePointerDown)
+    }
+  }, [gl.domElement])
 
   return (
     <group ref={groupRef}>
-      <SphereGlow />
-      <OrbitRings />
-      {skills.map((skill, index) => (
+      <SphereGlow isMobile={isMobile} />
+      <OrbitRings isMobile={isMobile} />
+      {activeSkills.map((skill, index) => (
         <SkillText
           key={skill}
           text={skill}
@@ -194,8 +202,17 @@ function SkillCloud() {
 }
 
 export default function SkillSphere() {
+  const [isMobile, setIsMobile] = useState(false)
+
+  useEffect(() => {
+    setIsMobile(window.innerWidth < 768)
+    const handleResize = () => setIsMobile(window.innerWidth < 768)
+    window.addEventListener("resize", handleResize)
+    return () => window.removeEventListener("resize", handleResize)
+  }, [])
+
   return (
-    <div className="w-full h-[450px] md:h-[550px] relative">
+    <div className="w-full h-[250px] md:h-[550px] relative">
       {/* Outer glow effect */}
       <div 
         className="absolute inset-0 pointer-events-none"
@@ -203,26 +220,34 @@ export default function SkillSphere() {
           background: "radial-gradient(ellipse at center, rgba(6, 182, 212, 0.08) 0%, transparent 50%)",
         }}
       />
-      <Canvas
-        camera={{ position: [0, 0, 5.5], fov: 55 }}
-        style={{ background: "transparent" }}
-        gl={{ antialias: true, alpha: true }}
-      >
-        <ambientLight intensity={0.6} />
-        <pointLight position={[10, 10, 10]} intensity={0.8} color="#06b6d4" />
-        <pointLight position={[-10, -10, -10]} intensity={0.4} color="#3b82f6" />
-        <SkillCloud />
-        <OrbitControls
-          enableZoom={false}
-          enablePan={false}
-          autoRotate
-          autoRotateSpeed={0.3}
-          minPolarAngle={Math.PI / 4}
-          maxPolarAngle={Math.PI * 3 / 4}
-          dampingFactor={0.05}
-          enableDamping
-        />
-      </Canvas>
+      <ErrorBoundary>
+        <Canvas
+          camera={{ position: [0, 0, 5.5], fov: 55 }}
+          style={{ background: "transparent" }}
+          gl={{ antialias: true, alpha: true, powerPreference: "default", preserveDrawingBuffer: true }}
+          onCreated={({ gl }) => {
+            gl.domElement.addEventListener('webglcontextlost', (e) => {
+              e.preventDefault()
+              console.warn('WebGL context lost')
+            })
+          }}
+        >
+          <ambientLight intensity={0.6} />
+          <pointLight position={[10, 10, 10]} intensity={0.8} color="#06b6d4" />
+          <pointLight position={[-10, -10, -10]} intensity={0.4} color="#3b82f6" />
+          <SkillCloud isMobile={isMobile} />
+          <OrbitControls
+            enableZoom={false}
+            enablePan={false}
+            autoRotate
+            autoRotateSpeed={isMobile ? 0.15 : 0.3}
+            minPolarAngle={Math.PI / 4}
+            maxPolarAngle={Math.PI * 3 / 4}
+            dampingFactor={0.05}
+            enableDamping
+          />
+        </Canvas>
+      </ErrorBoundary>
     </div>
   )
 }

@@ -11,7 +11,7 @@ const highlights = [
 
 export default function ResearchSection() {
   return (
-    <section id="research" className="py-20 px-6 relative">
+    <section id="research" className="py-12 sm:py-16 px-4 sm:px-6 relative">
       <div className="max-w-4xl mx-auto">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -33,7 +33,7 @@ export default function ResearchSection() {
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.2 }}
           viewport={{ once: true }}
-          className="glass rounded-2xl p-8 relative overflow-hidden group"
+          className="glass rounded-2xl p-6 sm:p-8 relative overflow-hidden group"
         >
           {/* Published Badge */}
           <div className="absolute top-6 right-6">
@@ -85,7 +85,7 @@ export default function ResearchSection() {
           {/* View Paper Button */}
           <motion.a
             href="#"
-            className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-gradient-to-r from-primary to-cyan-500 text-white font-medium hover:opacity-90 transition-opacity"
+            className="flex w-full sm:w-auto justify-center items-center gap-2 px-6 py-3 rounded-xl bg-gradient-to-r from-primary to-cyan-500 text-white font-medium hover:opacity-90 transition-opacity"
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
           >

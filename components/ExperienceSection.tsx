@@ -9,21 +9,21 @@ const experiences = [
   {
     company: "Tata",
     role: "Data Analytics Virtual Experience",
-    period: "2024",
+    period: "2025",
     description: "Analyzed business data to derive actionable insights and created comprehensive data visualizations.",
     type: "Virtual Experience",
   },
   {
     company: "Deloitte",
     role: "Data Analytics Virtual Experience",
-    period: "2024",
+    period: "2025",
     description: "Worked on data analysis projects, applying statistical methods and creating business intelligence reports.",
     type: "Virtual Experience",
   },
   {
     company: "Dynamix Networks",
     role: "Python Intern",
-    period: "2023",
+    period: "2026",
     description: "Developed Python-based solutions for network automation and data processing tasks.",
     type: "Internship",
   },
@@ -34,7 +34,7 @@ export default function ExperienceSection() {
   const isInView = useInView(ref, { once: true, margin: "-100px" })
 
   return (
-    <section id="experience" ref={ref} className="py-20 px-6">
+    <section id="experience" ref={ref} className="py-12 sm:py-16 px-4 sm:px-6">
       <div className="max-w-2xl mx-auto">
         <motion.div
           initial={{ opacity: 0, y: 30 }}
@@ -64,7 +64,7 @@ export default function ExperienceSection() {
                     <Briefcase className="w-5 h-5 text-primary" />
                   </div>
 
-                  <div className="glass rounded-2xl p-6 hover:border-primary/40 transition-all">
+                  <div className="glass rounded-2xl p-5 sm:p-6 hover:border-primary/40 transition-all">
                     <div className="flex flex-wrap items-center gap-2 mb-2">
                       <span className="px-3 py-1 text-xs font-medium bg-primary/20 text-primary rounded-full">
                         {exp.type}

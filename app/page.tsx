@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import GalaxyBackground from "@/components/GalaxyBackground"
+import dynamic from "next/dynamic"
 import Navigation from "@/components/Navigation"
 import HeroSection from "@/components/HeroSection"
 import AboutSection from "@/components/AboutSection"
@@ -10,6 +10,10 @@ import ProjectsSection from "@/components/ProjectsSection"
 import ResearchSection from "@/components/ResearchSection"
 import ExperienceSection from "@/components/ExperienceSection"
 import ContactSection from "@/components/ContactSection"
+
+const GalaxyBackground = dynamic(() => import("@/components/GalaxyBackground"), {
+  ssr: false,
+})
 
 const sectionIds = ["hero", "about", "skills", "projects", "research", "experience", "contact"]
 
@@ -53,7 +57,7 @@ export default function Home() {
   }
 
   return (
-    <main className="relative min-h-screen bg-[#050816]">
+    <main className="relative min-h-screen bg-background text-foreground overflow-x-hidden transition-colors duration-500">
       <GalaxyBackground />
       <Navigation onNavigate={handleNavigate} activeSection={activeSection} />
 
