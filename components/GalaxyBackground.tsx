@@ -304,8 +304,8 @@ const GalaxyBackground = React.memo(function GalaxyBackground() {
         />
       </div>
 
-      {/* Shooting stars (Hidden on mobile for performance) */}
-      <div className="hidden md:block">
+      {/* Shooting stars - Enabled on mobile */}
+      <div>
         <ShootingStars />
       </div>
     </>
